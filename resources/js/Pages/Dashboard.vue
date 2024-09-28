@@ -1,30 +1,22 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head } from '@inertiajs/vue3';
+defineOptions({ layout: AuthenticatedLayout });
+
 </script>
 
 <template>
-    <Head title="Dashboard" />
+    <Head title="Modules" />
 
-    <AuthenticatedLayout>
-        <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800"
-            >
-                Dashboard
-            </h2>
-        </template>
-
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div
-                    class="overflow-hidden bg-white shadow-sm sm:rounded-lg"
-                >
-                    <div class="p-6 text-gray-900">
-                        You're logged in!
-                    </div>
-                </div>
-            </div>
+    <main class="grid grid-cols-1 md:grid-cols-3">
+        <div id="modules" class="m-h-20 bg-red-500">
+            <h1>Modules</h1>
         </div>
-    </AuthenticatedLayout>
+
+        <div id="test-case" class="m-h-20 col-span-2 bg-yellow-500">
+            <h1>Test Case</h1>
+        </div>
+
+    </main>
+
 </template>
