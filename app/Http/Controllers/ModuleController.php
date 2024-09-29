@@ -10,13 +10,20 @@ use Inertia\Inertia;
 
 class ModuleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
         $userRoot = Module::where('name', $user->email)->first();
         $modules = $userRoot->descendantsOf($userRoot->id)->toTree($userRoot->id);
 
         $tree = $this->buildTree($modules);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => ['modules' => $tree]
+            ]);
+        }
 
         return Inertia::render('Dashboard', [
             'modules' => $tree,

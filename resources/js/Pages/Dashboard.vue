@@ -5,7 +5,6 @@ import Module from "@/Components/Module.vue";
 import {useModuleStore} from "@/store/module.js";
 import AddModuleModal from "@/Components/Module/AddModuleModal.vue";
 import {ref, useTemplateRef} from "vue";
-import {storeToRefs} from "pinia";
 
 defineOptions({layout: AuthenticatedLayout});
 
@@ -23,6 +22,7 @@ const props = defineProps({
     }
 });
 
+const refreshIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outline/arrow-path.svg';
 </script>
 
 <template>
@@ -34,17 +34,24 @@ const props = defineProps({
             <div class="p-5 flex flex-col gap-2 w-full">
                 <div class="flex justify-between items-center">
                     <h2 class="">Modules</h2>
-                    <button class="btn btn-outline btn-primary btn-sm" @click="moduleStore.addModuleModal?.openModal()">+ Add</button>
+                    <div class="flex items-center gap-2">
+                        <button class="btn btn-sm" @click="moduleStore.refreshModules()">
+                            <img :src="refreshIcon" alt="refresh icon" class="inline-block w-6 h-6">
+                        </button>
+                        <button class="btn btn-outline btn-primary btn-sm inline-block"
+                                @click="moduleStore.addModuleModal?.openModal()">+ Add
+                        </button>
+                    </div>
                 </div>
                 <hr>
-                <Module :folders="modules" :rootId="rootId"/>
+                <Module :modules="modules" :rootId="rootId"/>
             </div>
         </div>
+
         <div id="test-case" class="min-h-screen col-span-3">
             <h1>Test Case</h1>
             {{ moduleStore.selectedModule }}
         </div>
-
     </main>
 
 </template>

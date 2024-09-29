@@ -3,8 +3,10 @@ import axios from "axios";
 import {ref} from "vue";
 import Multiselect from "@vueform/multiselect";
 import {useToast} from "vue-toastification";
+import {useModuleStore} from "@/store/module.js";
 
 const toast = useToast();
+const moduleStore = useModuleStore();
 
 const selectedSubModule = ref(null);
 const selectedModule = ref(null);
@@ -29,8 +31,6 @@ const openModal = async (moduleId = null) => {
             };
         });
 
-
-        console.log(options.value);
         modal.showModal();
     } catch (e) {
         console.error(e);
@@ -56,6 +56,7 @@ const addModule = async () => {
             name: newModuleName.value
         });
 
+        moduleStore.refreshModules();
         toast.success('Module added successfully');
         closeModal();
     } catch (e) {

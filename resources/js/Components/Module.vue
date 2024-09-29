@@ -1,9 +1,11 @@
 <script setup>
-import {ref} from 'vue';
 import ModuleList from "@/Components/Module/ModuleList.vue";
+import {useModuleStore} from "@/store/module.js";
+
+const moduleStore = useModuleStore();
 
 const $props = defineProps({
-    folders: {
+    modules: {
         type: Array,
         required: true
     },
@@ -13,13 +15,13 @@ const $props = defineProps({
     }
 });
 
-const folders = ref($props.folders);
+moduleStore.modules = $props.modules;
 
 </script>
 
 <template>
     <div :data-parent-id="rootId" class="p-4 overflow-scroll min-h-screen max-h-screen w-full">
-        <ModuleList :modules="folders"/>
+        <ModuleList :modules="moduleStore.modules"/>
     </div>
 </template>
 
