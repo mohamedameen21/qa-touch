@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Module;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -44,7 +45,14 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
+        Module::create([
+            'name' => $user->email,
+            'user_id' => $user->id,
+        ])->saveAsRoot();
+
         Auth::login($user);
+
+        // TODO: On Login and Registration, we need to check the email is verified with Google or not
 
         return redirect(route('dashboard', absolute: false));
     }

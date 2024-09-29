@@ -15,10 +15,9 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('path')->nullable(); // this is used to show the module directly, when the path is mentioned in the url
-            $table->integer('position');
+            $table->integer('position')->nullable();
             $table->nestedSet();
             $table->timestamps();
-
         });
     }
 

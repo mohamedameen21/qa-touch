@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -15,9 +16,10 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [ModuleController::class,'index'])->middleware(['auth'])->name('dashboard');
+
+Route::get('/modules/{moduleId?}', [ModuleController::class,'getDirectChildren'])->middleware(['auth'])->name('modules.options');
+Route::post('/modules/{moduleId?}', [ModuleController::class,'store'])->middleware(['auth'])->name('modules.store');
 
 Route::get('/auth/google', [GoogleAuthController::class, 'authWithGoogle'])->name('auth.google');
 Route::get('/auth/google/call-back', [GoogleAuthController::class, 'authWithGoogleCallback']);
