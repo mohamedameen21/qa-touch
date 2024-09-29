@@ -14,8 +14,6 @@ class ModuleFactory extends Factory
         return [
             'user_id' => 1, // Create associated user
             'name' => ucfirst($this->faker->word),
-            'path' => null,
-            'position' => null
         ];
     }
 }

@@ -16,10 +16,11 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', [ModuleController::class,'index'])->middleware(['auth'])->name('dashboard');
+Route::get('/dashboard', [ModuleController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
-Route::get('/modules/{moduleId?}', [ModuleController::class,'getDirectChildren'])->middleware(['auth'])->name('modules.options');
-Route::post('/modules/{moduleId?}', [ModuleController::class,'store'])->middleware(['auth'])->name('modules.store');
+Route::get('/modules/{moduleId?}', [ModuleController::class, 'getSubModules'])->middleware(['auth'])->name('modules.options');
+Route::post('/modules/{moduleId?}', [ModuleController::class, 'store'])->middleware(['auth'])->name('modules.store');
+Route::put('module/', [ModuleController::class, 'update'])->middleware(['auth'])->name('modules.update');
 
 Route::get('/auth/google', [GoogleAuthController::class, 'authWithGoogle'])->name('auth.google');
 Route::get('/auth/google/call-back', [GoogleAuthController::class, 'authWithGoogleCallback']);
@@ -31,4 +32,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

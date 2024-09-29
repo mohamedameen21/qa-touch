@@ -16,6 +16,10 @@ const props = defineProps({
     modules: {
         type: Array,
         required: true
+    },
+    rootId: {
+        type: Number,
+        required: true
     }
 });
 
@@ -33,7 +37,7 @@ const props = defineProps({
                     <button class="btn btn-outline btn-primary btn-sm" @click="moduleStore.addModuleModal?.openModal()">+ Add</button>
                 </div>
                 <hr>
-                <Module :folders="modules"/>
+                <Module :folders="modules" :rootId="rootId"/>
             </div>
         </div>
         <div id="test-case" class="min-h-screen col-span-3">

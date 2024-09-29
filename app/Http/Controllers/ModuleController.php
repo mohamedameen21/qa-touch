@@ -12,17 +12,19 @@ class ModuleController extends Controller
 {
     public function index()
     {
-        $userRoot = Module::where('name', 'mohamedameen0786@gmail.com')->first();
+        $user = auth()->user();
+        $userRoot = Module::where('name', $user->email)->first();
         $modules = $userRoot->descendantsOf($userRoot->id)->toTree($userRoot->id);
 
         $tree = $this->buildTree($modules);
 
         return Inertia::render('Dashboard', [
-            'modules' => $tree
+            'modules' => $tree,
+            'rootId' => $userRoot->id
         ]);
     }
 
-    public function getDirectChildren(Request $request, $moduleId = null)
+    public function getSubModules(Request $request, $moduleId = null)
     {
         $user = auth()->user();
         $userRoot = Module::where('name', $user->email)->first();
@@ -73,12 +75,18 @@ class ModuleController extends Controller
 
     }
 
+    public function update(Request $request)
+    {
+        dd($request->all());
+    }
+
     private function buildTree($modules): array
     {
         return $modules->map(function ($module) {
             return [
                 'id' => $module->id,
                 'name' => $module->name,
+                'order' => $module->order,
                 'open' => false,
                 'children' => $this->buildTree($module->children)
             ];

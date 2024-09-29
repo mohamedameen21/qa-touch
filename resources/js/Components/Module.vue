@@ -6,6 +6,10 @@ const $props = defineProps({
     folders: {
         type: Array,
         required: true
+    },
+    rootId: {
+        type: Number,
+        required: true
     }
 });
 
@@ -14,7 +18,7 @@ const folders = ref($props.folders);
 </script>
 
 <template>
-    <div class="p-4 overflow-scroll min-h-screen max-h-screen w-full">
+    <div :data-parent-id="rootId" class="p-4 overflow-scroll min-h-screen max-h-screen w-full">
         <ModuleList :modules="folders"/>
     </div>
 </template>

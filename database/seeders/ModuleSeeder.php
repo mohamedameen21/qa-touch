@@ -11,16 +11,17 @@ class ModuleSeeder extends Seeder
     public function run(): void
     {
 
-        $userRoot = \App\Models\Module::where('name', 'mohamedameen0786@gmail.com')->first();
+        $user = User::first();
+        $userRoot = Module::where('name', $user->email)->first();
 
         $modules = Module::factory()
-            ->count(10)
+            ->count(rand(5, 10))
             ->create();
 
-
-        foreach ($modules as $module) {
+        foreach ($modules as $index => $module) {
+            $module->order = $index;
             $module->appendToNode($userRoot)->save();
-            $this->createModules($module, 10);
+            $this->createModules($module, rand(2, 7));
         }
     }
 
@@ -31,10 +32,11 @@ class ModuleSeeder extends Seeder
         }
 
         $modules = Module::factory()
-            ->count(2)
+            ->count(rand(0, 6))
             ->create();
 
-        foreach ($modules as $module) {
+        foreach ($modules as $index => $module) {
+            $module->order = $index;
             $module->appendToNode($parent)->save();
             $this->createModules($module, $depth - 1);
         }

@@ -1,6 +1,7 @@
 <script setup>
 import {useModuleStore} from "@/store/module.js";
 import draggable from "vuedraggable";
+import axios from "axios";
 
 const moduleStore = useModuleStore();
 
@@ -35,6 +36,37 @@ const handleClick = (folder) => {
     }
 };
 
+const handleDrag = async (event) => {
+    const draggedItem = event.item;
+    const fromItem = event.from;
+    const toItem = event.to;
+
+    const oldIndex = event.oldDraggableIndex;
+    const newIndex = event.newDraggableIndex;
+    const draggedItemId = draggedItem.getAttribute('data-module-id'); // Use getAttribute to retrieve the ID
+    const oldParentId = fromItem.parentNode.getAttribute('data-parent-id');
+    const newParentId = toItem.parentNode.getAttribute('data-parent-id');
+
+    if(oldParentId === newParentId) { // Re ordering
+        console.log(`Reordering item with ID ${draggedItemId} from index ${oldIndex} to index ${newIndex}`);
+    } else {
+        console.log(`Moving item with ID ${draggedItemId} from parent ${oldParentId} to parent ${newParentId}`);
+    }
+
+    try {
+        const response = await axios.put(route('modules.update'), {
+            id: draggedItemId,
+            oldIndex: oldIndex,
+            newIndex: newIndex,
+            oldParentId: oldParentId,
+            newParentId: newParentId
+        });
+        console.log(response.data);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
 // Icon URLs
 const openIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outline/folder-open.svg';
 const closeIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outline/folder.svg';
@@ -43,9 +75,15 @@ const chevronRightIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outli
 </script>
 
 <template>
-    <draggable :list="modules" group="modules" handle=".folder-handle" item-key="id">
+    <draggable
+        :list="modules"
+        group="modules"
+        handle=".folder-handle"
+        item-key="id"
+        @end="handleDrag"
+    >
         <template #item="{ element: module }">
-            <div :key="module.id" class="relative mb-3 w-full">
+            <div :data-module-id="module.id" :key="module.id" class="relative mb-3 w-full">
                 <span class="absolute top-0 -left-2 w-4 h-full border-l border-gray-400"></span>
 
                 <!-- Folder item -->
@@ -56,6 +94,7 @@ const chevronRightIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outli
                     :class="{
                         'bg-blue-200': module.id === moduleStore.selectedModule
                     }"
+                    :data-module-id="module.id"
                 >
                     <div class="flex w-full justify-between items-center gap-2">
                         <div class="flex gap-2 items-center">
@@ -73,12 +112,14 @@ const chevronRightIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outli
                                 class="w-4 h-4"
                             />
                         </div>
-                        <button @click.stop="moduleStore.addModuleModal?.openModal(module.id)" class="btn btn-xs mr-5 px-5 text-base">+</button>
+                        <button @click.stop="moduleStore.addModuleModal?.openModal(module.id)"
+                                class="btn btn-xs mr-5 px-5 text-base">+
+                        </button>
                     </div>
                 </div>
 
                 <!-- Nested folders -->
-                <div v-if="module.open" class="ml-6 mt-2">
+                <div :data-parent-id="module.id" v-if="module.open" class="ml-6 mt-2">
                     <ModuleList
                         v-if="module.children && module.children.length > 0"
                         :modules="module.children"
@@ -96,7 +137,6 @@ const chevronRightIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outli
     border-left-width: 2px;
 }
 </style>
-
 
 
 <!--<template>-->
