@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue';
-import ApplicationLogo from '@/Components/ApplicationLogo.vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+import ApplicationLogo from '@/Components/Utilities/ApplicationLogo.vue';
+import Dropdown from '@/Components/Utilities/Dropdown.vue';
+import DropdownLink from '@/Components/Utilities/DropdownLink.vue';
+import NavLink from '@/Components/Utilities/NavLink.vue';
+import ResponsiveNavLink from '@/Components/Utilities/ResponsiveNavLink.vue';
 import { Link } from '@inertiajs/vue3';
 
 const showingNavigationDropdown = ref(false);
@@ -12,7 +12,7 @@ const showingNavigationDropdown = ref(false);
 
 <template>
     <div>
-        <div class="min-h-screen bg-gray-100">
+        <div class="">
             <nav
                 class="border-b border-gray-100 bg-white"
             >
@@ -190,9 +190,15 @@ const showingNavigationDropdown = ref(false);
             </header>
 
             <!-- Page Content -->
-            <main>
+            <main class="h-full">
                 <slot />
             </main>
         </div>
     </div>
 </template>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+</style>

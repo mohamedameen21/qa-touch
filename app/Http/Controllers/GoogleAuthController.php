@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Module;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -24,6 +24,10 @@ class GoogleAuthController extends Controller
             'name' => $user->getName(),
             'google_id' => $user->getId()
         ]);
+
+        Module::updateOrCreate([
+            'name' => $user->email,
+        ], ['user_id' => $user->id])->saveAsRoot();
 
         Auth::login($user, true);
 
