@@ -82,15 +82,26 @@ A dummy user is created during the seeding process. You can use the following cr
 
 You can also register a new user or sign in using Google.
 
+### 9. Storage Link
+
+To link the storage disk with public folder:
+
+```bash
+php artisan storage:link
+```
+
 ### 9. Serve the Application
 
 To start the development server, use the command below:
 
 ```bash
-php artisan serve
+php artisan serve --host=localhost --port=8000
 ```
 
 The application should now be available at `http://localhost:8000`.
+
+**Note**: You Application should be sereved at this same host name with port number to get Google auth in your local.
+
 
 ## Application Login
 
