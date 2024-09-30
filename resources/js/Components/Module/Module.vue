@@ -20,7 +20,7 @@ moduleStore.modules = $props.modules;
 </script>
 
 <template>
-    <div :data-parent-id="rootId" class="p-4 overflow-scroll min-h-screen max-h-screen w-full">
+    <div :data-parent-id="rootId" class="p-4 overflow-scroll max-h-[40rem] w-full">
         <ModuleList :modules="moduleStore.modules"/>
     </div>
 </template>

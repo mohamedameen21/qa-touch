@@ -49,14 +49,19 @@ defineExpose({
 
 const addModule = async () => {
     try {
-        const parentId = selectedModule.value ? selectedModule.value : null; // null equals to Root
+        const parentId = selectedSubModule.value ?? selectedModule.value ?? null; // null equals to Root
 
         const response = await axios.post(route('modules.store'), {
             parent_id: parentId,
             name: newModuleName.value
         });
 
-        moduleStore.refreshModules();
+        await moduleStore.refreshModules();
+
+        if (moduleStore.modules.length === 1) {  // first module
+            moduleStore.setSelectedModule(moduleStore.modules[0].id);
+        }
+
         toast.success('Module added successfully');
         closeModal();
     } catch (e) {
@@ -75,7 +80,8 @@ const addModule = async () => {
         <div class="modal-box !min-h-72">
             <h3 class="text-lg font-bold mb-3">Add Module/Sub Module</h3>
             <div class="mt-6">
-                <Multiselect v-model="selectedSubModule" :options="options" :searchable="true" placeholder="Select Sub Module"/>
+                <Multiselect v-model="selectedSubModule" :options="options" :searchable="true"
+                             placeholder="Select Sub Module"/>
             </div>
 
             <input v-model="newModuleName"

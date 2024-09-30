@@ -6,9 +6,10 @@ use App\Models\Module;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class NewModuleRequest extends FormRequest
+class ModuleCreateUpdateRequest extends FormRequest
 {
     private $parent = null;
+    private $moduleId = null;
 
     /**
      * Determine if the user is authorized to make this request.
@@ -27,15 +28,24 @@ class NewModuleRequest extends FormRequest
     {
         return [
             'parent_id' => ['sometimes', 'nullable', 'exists:modules,id'],
-            'name' => ['required', 'string', 'max:255', Rule::unique('modules', 'name')->where(function ($query) {
-                return $query->where('parent_id', $this->parent->id);
-            })],
+            'name' => ['required', 'string', 'max:255', function ($attribute, $value, $fail) {
+                $moduleExists = Module::where('parent_id', $this->parent->id)
+                    ->where('name', $value)
+                    ->when($this->moduleId, function ($query) {
+                        return $query->where('id', '!=', $this->moduleId);
+                    })->exists();
+
+                if ($moduleExists) {
+                    $fail('The ' . $attribute . ' has already been taken.');
+                }
+            }],
         ];
     }
 
     protected function prepareForValidation()
     {
         $parentId = $this->input('parent_id', null);
+        $this->moduleId = $this->route('moduleId');
 
         $this->parent = $parentId ? Module::find($parentId) : Module::where('name', auth()->user()->email)->first();
 

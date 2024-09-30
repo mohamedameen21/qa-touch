@@ -15,13 +15,13 @@ class ModuleSeeder extends Seeder
         $userRoot = Module::where('name', $user->email)->first();
 
         $modules = Module::factory()
-            ->count(rand(5, 10))
+            ->count(rand(2, 4))
             ->create();
 
         foreach ($modules as $index => $module) {
             $module->order = $index;
             $module->appendToNode($userRoot)->save();
-            $this->createModules($module, rand(2, 7));
+            $this->createModules($module, rand(3, 6));
         }
     }
 
@@ -32,7 +32,7 @@ class ModuleSeeder extends Seeder
         }
 
         $modules = Module::factory()
-            ->count(rand(0, 6))
+            ->count(rand(1, 4))
             ->create();
 
         foreach ($modules as $index => $module) {

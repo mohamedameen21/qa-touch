@@ -17,7 +17,10 @@ class DatabaseSeeder extends Seeder
     {
         $user = User::factory()
             ->count(1)
-            ->create()
+            ->create([
+                'name' => 'Demo User',
+                'email' => 'demouser@gmail.com'
+            ])
             ->first();
 
         Module::create([
@@ -26,5 +29,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call(ModuleSeeder::class);
+        $this->call(TestCaseSeeder::class);
     }
 }

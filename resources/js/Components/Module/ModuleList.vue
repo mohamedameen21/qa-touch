@@ -2,10 +2,11 @@
 import {useModuleStore} from "@/store/module.js";
 import draggable from "vuedraggable";
 import axios from "axios";
+import {onMounted} from "vue";
 
 const moduleStore = useModuleStore();
 
-defineProps({
+const props = defineProps({
     modules: {
         type: Array,
         required: true
@@ -16,9 +17,9 @@ const toggleFolder = (folder) => {
     folder.open = !folder.open;
 };
 
-const handleDoubleClick = (folder) => {
-    folder.open = true;
-    moduleStore.setSelectedModule(folder.id);
+const handleDoubleClick = (module) => {
+    module.open = true;
+    moduleStore.setSelectedModule(module.id);
 };
 
 let clickTimeout = null;
@@ -46,14 +47,14 @@ const handleDrag = async (event) => {
     const oldParentId = fromItem.parentNode.getAttribute('data-parent-id');
     const newParentId = toItem.parentNode.getAttribute('data-parent-id');
 
-    if(oldParentId === newParentId) { // Re ordering
+    if (oldParentId === newParentId) { // Re ordering
         console.log(`Reordering item with ID ${draggedItemId} from index ${oldIndex} to index ${newIndex}`);
     } else {
         console.log(`Moving item with ID ${draggedItemId} from parent ${oldParentId} to parent ${newParentId}`);
     }
 
     try {
-        const response = await axios.put(route('modules.update'), {
+        const response = await axios.post(route('modules.syncDrag'), {
             id: draggedItemId,
             oldIndex: oldIndex,
             newIndex: newIndex,
@@ -71,6 +72,12 @@ const openIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outline/folde
 const closeIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outline/folder.svg';
 const chevronDownIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outline/chevron-down.svg';
 const chevronRightIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outline/chevron-right.svg';
+
+onMounted(() => {
+    if (moduleStore.selectedModuleId === null && props.modules.length > 0) {
+        moduleStore.setSelectedModule(props.modules[0].id);
+    }
+});
 </script>
 
 <template>
@@ -84,15 +91,16 @@ const chevronRightIcon = 'https://cdn.jsdelivr.net/npm/heroicons@2.0.13/24/outli
     >
         <template #item="{ element: module }" class="w-full h-full">
             <div :data-module-id="module.id" :key="module.id" class="relative mb-3 w-full">
-                <span class="absolute top-0 -left-2 w-4 h-full border-l border-gray-400"></span>
+                <span v-if="module.children && module.children.length > 0"
+                      class="absolute top-0 -left-2 w-4 h-full border-l border-gray-400"></span>
 
                 <!-- Folder item -->
                 <div
                     @click="handleClick(module)"
                     @dblclick.stop="handleDoubleClick(module)"
-                    class="cursor-pointer flex shrink-0	 items-center justify-between gap-2 text-nowrap relative ml-6 text-black hover:bg-blue-200 rounded-md w-full folder-handle py-1 select-none min-w-56"
+                    class="cursor-pointer flex shrink-0	 items-center justify-between gap-2 text-nowrap relative text-black hover:bg-blue-200 rounded-md w-full folder-handle py-1 select-none min-w-60"
                     :class="{
-                        'bg-blue-200': module.id === moduleStore.selectedModule
+                        'bg-blue-200': module.id === moduleStore.selectedModuleId
                     }"
                     :data-module-id="module.id"
                 >

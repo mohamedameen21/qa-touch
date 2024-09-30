@@ -10,12 +10,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('modules', function (Blueprint $table) {
+        Schema::create('test_cases', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->integer('order')->nullable();
-            $table->nestedSet();
+            $table->foreignId('module_id')->constrained()->cascadeOnDelete();
+            $table->string('ticket_no')->autoIncrement()->unique();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->string('file_path')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -26,6 +28,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('modules');
+        Schema::dropIfExists('test_cases');
     }
 };

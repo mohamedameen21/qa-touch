@@ -21,6 +21,8 @@
     "dependencies": {
         "@vueform/multiselect": "^2.6.10",
         "pinia": "^2.2.2",
+        "sweetalert": "^2.1.2",
+        "sweetalert2": "^11.14.1",
         "vue-toastification": "^2.0.0-rc.5",
         "vuedraggable": "^4.1.0"
     }

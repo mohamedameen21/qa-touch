@@ -3,6 +3,7 @@
 use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TestCaseController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -16,16 +17,30 @@ Route::get('/', function () {
     ]);
 });
 
+// main page
 Route::get('/dashboard', [ModuleController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
-Route::get('/modules/{moduleId?}', [ModuleController::class, 'getSubModules'])->middleware(['auth'])->name('modules.options');
-Route::post('/modules/{moduleId?}', [ModuleController::class, 'store'])->middleware(['auth'])->name('modules.store');
-Route::put('module/', [ModuleController::class, 'update'])->middleware(['auth'])->name('modules.update');
+// modules
+Route::middleware(['auth'])->prefix('modules')->name('modules.')->group(function () {
+    Route::get('/{moduleId?}', [ModuleController::class, 'getSubModules'])->name('options');
+    Route::post('/', [ModuleController::class, 'store'])->name('store');
+    Route::put('/{moduleId}', [ModuleController::class, 'update'])->name('update');
+    Route::delete('/{moduleId}', [ModuleController::class, 'destroy'])->name('destroy');
 
+    Route::post('/refresh', [ModuleController::class, 'refresh'])->name('refresh');
+    Route::post('/drag', [ModuleController::class, 'syncDrag'])->name('syncDrag');
+});
+
+
+// test case
+Route::get('/module/{moduleId}/testCase', [TestCaseController::class, 'index'])->middleware(['auth'])->name('modules.testCase');
+
+
+// google auth
 Route::get('/auth/google', [GoogleAuthController::class, 'authWithGoogle'])->name('auth.google');
 Route::get('/auth/google/call-back', [GoogleAuthController::class, 'authWithGoogleCallback']);
 
-
+// auth
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
