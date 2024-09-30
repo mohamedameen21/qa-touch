@@ -25,11 +25,9 @@ class TestCase extends Model
 
     private function generateTicketNumber()
     {
-        // Get the last created test case
         $lastTestCase = static::orderBy('id', 'desc')->first();
 
         if (!$lastTestCase) {
-            // If no test case exists, start from 1
             $nextNumber = 1;
         } else {
             // Extract the last number from ticket_no (assuming it's always like TC001)

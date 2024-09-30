@@ -4,7 +4,7 @@ import axios from "axios";
 
 export const useModuleStore = defineStore('useModuleStore', () => {
     const selectedModuleId = ref(null)
-    const addModuleModal = ref(false)
+    const addModuleModal = ref(false) // html modal
     const modules = ref([])
     const moduleWithTestCases = ref(null)
 
@@ -36,7 +36,7 @@ export const useModuleStore = defineStore('useModuleStore', () => {
 
     async function fetchTestCases(moudleId) {
         try {
-            const response = await axios.get(route('modules.testCase', moudleId));
+            const response = await axios.get(route('testCase.index', moudleId));
             moduleWithTestCases.value = response.data.data.module;
         } catch (e) {
             console.error(e);
@@ -50,6 +50,6 @@ export const useModuleStore = defineStore('useModuleStore', () => {
         moduleWithTestCases,
         setSelectedModule,
         refreshModules,
-        fetchTestCases
+        fetchTestCases,
     }
 })

@@ -61,16 +61,28 @@ const addModule = async () => {
         if (moduleStore.modules.length === 1) {  // first module
             moduleStore.setSelectedModule(moduleStore.modules[0].id);
         }
-
         toast.success('Module added successfully');
-        closeModal();
+
+        return true;
     } catch (e) {
         if (e?.response?.data?.message) {
             toast.error(e.response.data.message);
         } else {
             toast.error('An error occurred while adding the module');
         }
+        return false;
     }
+}
+
+const save = async () => {
+    const result = await addModule();
+    if (result) {
+        closeModal();
+    }
+}
+
+const saveAndContinue = async () => {
+    await addModule();
 }
 
 </script>
@@ -90,7 +102,8 @@ const addModule = async () => {
 
             <div class="flex mt-7 justify-end gap-3">
                 <button class="btn btn-outline" @click="closeModal">Cancel</button>
-                <button class="btn btn-outline btn-primary" @click="addModule">Add</button>
+                <button class="btn btn-outline btn-primary" @click="save">Save</button>
+                <button class="btn btn-outline btn-primary" @click="saveAndContinue">Save and Continue</button>
             </div>
         </div>
     </dialog>

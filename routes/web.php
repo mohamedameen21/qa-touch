@@ -9,12 +9,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
+    return redirect('/dashboard');
 });
 
 // main page
@@ -32,8 +27,26 @@ Route::middleware(['auth'])->prefix('modules')->name('modules.')->group(function
 });
 
 
-// test case
-Route::get('/module/{moduleId}/testCase', [TestCaseController::class, 'index'])->middleware(['auth'])->name('modules.testCase');
+Route::middleware(['auth'])->group(function() {
+    // modules
+   Route::prefix('modules')->name('modules.')->group(function() {
+       Route::get('/{moduleId?}', [ModuleController::class, 'getSubModules'])->name('options');
+       Route::post('/', [ModuleController::class, 'store'])->name('store');
+       Route::put('/{moduleId}', [ModuleController::class, 'update'])->name('update');
+       Route::delete('/{moduleId}', [ModuleController::class, 'destroy'])->name('destroy');
+
+       Route::post('/refresh', [ModuleController::class, 'refresh'])->name('refresh');
+       Route::post('/drag', [ModuleController::class, 'syncDrag'])->name('syncDrag');
+   });
+
+   // test case
+    Route::prefix('module/{moduleId}')->group(function() {
+        Route::get('/testcase', [TestCaseController::class, 'index'])->name('testCase.index');
+        Route::post('/testcase', [TestCaseController::class, 'store'])->name('testCase.store');
+        Route::put('/testcase/{testCaseId}', [TestCaseController::class, 'update'])->name('testCase.update');
+        Route::delete('/testcase/{testCaseId}', [TestCaseController::class, 'destroy'])->name('testCase.destroy');
+    });
+});
 
 
 // google auth
