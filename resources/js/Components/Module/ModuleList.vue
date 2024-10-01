@@ -92,6 +92,8 @@ onMounted(() => {
         item-key="id"
         @end="handleDrag"
         class="w-full h-full"
+        :force-fallback="true"
+        :scroll-sensitivity="200"
     >
         <template #item="{ element: module }" class="w-full h-full">
             <div :data-module-id="module.id" :key="module.id" class="relative mb-3 w-full">

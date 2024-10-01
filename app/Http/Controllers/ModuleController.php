@@ -108,19 +108,10 @@ class ModuleController extends Controller
         DB::beginTransaction();
         try {
             $module = Module::findOrFail($moduleId);
-
             $module->refreshNode();
 
             if ($oldParentId === $newParentId) {
-                $hasChanged = true;
-                $steps = abs($newIndex - $oldIndex);
-                if ($newIndex > $oldIndex && $steps > 0) {
-                    $hasChanged = $module->down($steps);
-                    Log::info('Down', ['hasChanged' => $hasChanged]);
-                } else if ($steps > 0) {
-                    $hasChanged = $module->up($steps);
-                    Log::info('Up', ['hasChanged' => $hasChanged]);
-                }
+                $hasChanged = $this->reOrderWithinParent($module, $oldIndex, $newIndex);
 
                 if ($hasChanged) {
                     DB::commit();
@@ -139,24 +130,22 @@ class ModuleController extends Controller
                 }
 
             } else {
-                $newParent = Module::find($newParentId);
-                $module->parent_id = $newParent->id;
-                if ($module->save()) {
-                    if ($module->hasMoved()) {
-                        DB::commit();
+                $isMovedAndReOrdered = $this->moveToNewParent($module, $newParentId, $newIndex);
 
-                        return response()->json([
-                            'status' => 'success',
-                            'message' => 'Module moved successfully'
-                        ]);
-                    } else {
-                        DB::rollBack();
+                if($isMovedAndReOrdered) {
+                    DB::commit();
 
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'Failed to move module'
-                        ], 500);
-                    }
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Module moved successfully'
+                    ]);
+                } else {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Failed to move module'
+                    ], 500);
                 }
             }
         } catch (\Exception $e) {
