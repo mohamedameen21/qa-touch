@@ -13,11 +13,12 @@ use Inertia\Inertia;
 class ModuleController extends Controller
 {
     use ModuleTreeTrait;
+
     public function index(Request $request)
     {
         $user = auth()->user();
-        $userRoot = Module::where('name', $user->email)->first();
-        $modules = $userRoot->descendantsOf($userRoot->id)->toTree($userRoot->id);
+        $userRoot = Module::defaultOrder()->where('name', $user->email)->first();
+        $modules = Module::defaultOrder()->descendantsOf($userRoot->id)->toTree($userRoot->id);
 
         $tree = $this->buildTree($modules);
 
@@ -34,7 +35,7 @@ class ModuleController extends Controller
 
         $user = auth()->user();
         $userRoot = Module::where('name', $user->email)->first();
-        $modules = $userRoot->descendantsOf($userRoot->id)->toTree($userRoot->id);
+        $modules = Module::defaultOrder()->descendantsOf($userRoot->id)->toTree($userRoot->id);
 
         $tree = $this->buildTree($modules, $openModulesIds);
 
@@ -98,7 +99,75 @@ class ModuleController extends Controller
 
     public function syncDrag(Request $request)
     {
+        $moduleId = $request->input('id');
+        $oldParentId = $request->input('oldParentId');
+        $newParentId = $request->input('newParentId');
+        $oldIndex = $request->input('oldIndex');
+        $newIndex = $request->input('newIndex');
 
+        DB::beginTransaction();
+        try {
+            $module = Module::findOrFail($moduleId);
+
+            $module->refreshNode();
+
+            if ($oldParentId === $newParentId) {
+                $hasChanged = true;
+                $steps = abs($newIndex - $oldIndex);
+                if ($newIndex > $oldIndex && $steps > 0) {
+                    $hasChanged = $module->down($steps);
+                    Log::info('Down', ['hasChanged' => $hasChanged]);
+                } else if ($steps > 0) {
+                    $hasChanged = $module->up($steps);
+                    Log::info('Up', ['hasChanged' => $hasChanged]);
+                }
+
+                if ($hasChanged) {
+                    DB::commit();
+
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Module moved successfully'
+                    ]);
+                } else {
+                    DB::rollBack();
+
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Failed to move module'
+                    ], 500);
+                }
+
+            } else {
+                $newParent = Module::find($newParentId);
+                $module->parent_id = $newParent->id;
+                if ($module->save()) {
+                    if ($module->hasMoved()) {
+                        DB::commit();
+
+                        return response()->json([
+                            'status' => 'success',
+                            'message' => 'Module moved successfully'
+                        ]);
+                    } else {
+                        DB::rollBack();
+
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'Failed to move module'
+                        ], 500);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::info('Failed to move module', ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to move module'
+            ], 500);
+        }
     }
 
     public function update(ModuleCreateUpdateRequest $request, $moduleId)

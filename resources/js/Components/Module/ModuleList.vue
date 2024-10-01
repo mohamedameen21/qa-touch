@@ -3,8 +3,10 @@ import {useModuleStore} from "@/store/module.js";
 import draggable from "vuedraggable";
 import axios from "axios";
 import {onMounted} from "vue";
+import {useToast} from "vue-toastification";
 
 const moduleStore = useModuleStore();
+const toast = useToast();
 
 const props = defineProps({
     modules: {
@@ -61,9 +63,11 @@ const handleDrag = async (event) => {
             oldParentId: oldParentId,
             newParentId: newParentId
         });
-        console.log(response.data);
+
+        await moduleStore.refreshModules();
     } catch (e) {
         console.error(e);
+        toast.error('Failed to re-order modules');
     }
 }
 

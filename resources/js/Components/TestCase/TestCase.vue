@@ -6,6 +6,7 @@ import {ref, useTemplateRef} from "vue";
 import TestCaseActionModal from "@/Components/TestCase/TestCaseActionModal.vue";
 import axios from "axios";
 import {useToast} from "vue-toastification";
+import Swal from "sweetalert2";
 
 const moduleStore = useModuleStore();
 const toast = useToast();
@@ -24,17 +25,42 @@ const resetModuleWithTestCases = () => {
 
 const deleteTestCase = async (testCaseId) => {
     try {
-        await axios.delete(route('testCase.destroy', {
-            moduleId: moduleStore.selectedModuleId,
-            testCaseId: testCaseId
-        }));
-        toast.success('Test case deleted successfully');
-        moduleStore.fetchTestCases(moduleStore.selectedModuleId);
+        // Show SweetAlert confirmation dialog
+        await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this! The test case will be deleted.",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Yes, delete it!"
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                // If confirmed, proceed to delete the test case
+                const response = await axios.delete(route('testCase.destroy', {
+                    moduleId: moduleStore.selectedModuleId,
+                    testCaseId: testCaseId
+                }));
+
+                // Show success toast message and refresh test cases
+                toast.success('Test case deleted successfully');
+                await moduleStore.fetchTestCases(moduleStore.selectedModuleId);
+
+                // Show success SweetAlert after deletion
+                await Swal.fire({
+                    title: "Deleted!",
+                    text: "The test case has been deleted.",
+                    icon: "success"
+                });
+            }
+        });
     } catch (e) {
         console.error(e);
+        // Show error toast if deletion fails
         toast.error('Failed to delete test case');
     }
 };
+
 
 </script>
 

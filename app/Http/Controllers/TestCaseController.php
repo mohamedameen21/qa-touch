@@ -73,8 +73,11 @@ class TestCaseController extends Controller
             $file = $request->file('file');
             $filePath = $testCase->file_path;
 
-            if($file && $testCase->file_path) {
+            // deleting the previously uploaded file
+            if ($file && $testCase->file_path) {
                 Storage::disk('public')->delete($testCase->file_path);
+                $filePath = $this->storeAndGetFilePath($file);
+            } else if ($file) { // adding new file
                 $filePath = $this->storeAndGetFilePath($file);
             }
 
@@ -104,7 +107,7 @@ class TestCaseController extends Controller
         try {
             $testCase = TestCase::where('module_id', $moduleId)->findOrFail($testCaseId);
 
-            if($testCase->file_path) {
+            if ($testCase->file_path) {
                 Storage::disk('public')->delete($testCase->file_path);
             }
 

@@ -57,7 +57,7 @@ const deleteModule = async () => {
     try {
         await Swal.fire({
             title: "Are you sure?",
-            text: "The whole module including testcase will be delete",
+            text: "The whole module including all testcase will be delete",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",

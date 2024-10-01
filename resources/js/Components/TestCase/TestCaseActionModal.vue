@@ -100,6 +100,7 @@ const setFile = (e) => {
     }
 
     fileAttachment.value = e.target.files[0];
+    disableActionButtton.value = false;
 }
 
 const save = async () => {
